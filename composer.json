@@ -1,0 +1,18 @@
+{
+    "name": "caconnect/extslider",
+    "description": "External slider service extractor",
+    "type": "library",
+    "license": "caconnect",
+    "authors": [
+        {
+            "name": "Radis Ionut",
+            "email": "ionut.radis@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "caconnect\\extslider\\": "src/"
+        }
+    }
+}
