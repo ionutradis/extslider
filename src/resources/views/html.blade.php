@@ -2,13 +2,35 @@
     use caconnect\extslider\Models\Extslider;
     $slider = new Extslider();
     if(isset($id)) {
-        $slider->where('id', 212);
+        $slider = $slider->where('id', $id);
     }
-    if(isset($group)) {
-        $slider->where('group', $group);
+    if(isset($slug)) {
+        $slider = $slider->where('slug', $slug);
     }
-    //dd($slider->count);
+    $tag = 'section';
 @endphp
-@if($slider)
-    da
+@if(count($slider->get()) !== 0)
+{{--    @if(config('settings') == 'section')--}}
+{{--@endif--}}
+    @if($tag == 'yield')
+        @section('scripts')
+            {{ $slider->first()->scripts_content ?? '' }}
+        @endsection
+        @section('css')
+            {{ $slider->first()->css_content ?? '' }}
+        @endsection
+        @section('html')
+            {{ $slider->first()->html_content ?? '' }}
+        @endsection
+    @elseif($tag == 'stack')
+        @push('scripts')
+            {{ $slider->first()->scripts_content ?? '' }}
+        @endpush
+        @push('css')
+            {{ $slider->first()->css_content ?? '' }}
+        @endpush
+        @push('html')
+            {{ $slider->first()->html_content ?? '' }}
+        @endpush
+    @endif
 @endif
