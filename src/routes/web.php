@@ -1,3 +1,3 @@
 <?php
-Route::get('contact2', 'caconnect\extslider\Http\controllers\ExtSliderController@index');
+//Route::get('testpage', 'caconnect\extslider\Http\controllers\ExtSliderController@index');
 ?>

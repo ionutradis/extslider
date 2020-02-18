@@ -4,13 +4,26 @@ use App\Http\Controllers\Controller;
 use caconnect\extslider\Models\Extslider;
 use Illuminate\Support\Facades\Storage;
 
-class ExtSliderController extends Controller {
+class ExtSliderController {
 
-    private $feed, $alias, $group, $scripts, $css, $html;
+    private $feed, $alias, $group, $scripts, $css, $html, $sliderid, $formattedFeed, $identifier;
 
-    function __construct()
+    function __construct($identifier, $updateDB = false)
     {
+        $this->identifier = $identifier;
         $this->feed = config('settings.feed_url');
+        $this->init();
+        if($updateDB)
+            $this->updateTable();
+    }
+
+    private function init() {
+        $this->getSlider();
+        $this->setSliderid();
+        $this->setAlias();
+        $this->setGroup();
+        $this->setScripts();
+        $this->setHtml();
     }
 
     protected function loadXml() {
@@ -20,21 +33,54 @@ class ExtSliderController extends Controller {
             die('The provided format is not valid xml');
         }
     }
+    private function getSlider() {
+        switch(gettype($this->identifier)) {
+            case 'integer':
+                $param = 'id';
+                break;
+            case 'string':
+                $param = 'group';
+                break;
+        }
+        $this->formattedFeed = json_decode(json_encode($this->loadXml()->xpath('//slider['.$param.'="'.$this->identifier.'"]')[0]), 1);
+    }
+    private function setAlias() {
+        $this->alias = $this->formattedFeed['alias'];
+    }
+    private function setSliderid() {
+        $this->sliderid= $this->formattedFeed['id'];
+    }
+    private function setGroup() {
+        $this->group = $this->formattedFeed['group'];
+    }
+    private function setCss() {
+//        $this->css = $this->formattedFeed['css'];
+    }
+    private function setScripts() {
+        $fileNameArray = \Storage::disk('public')->url('sliders/'.$this->sliderid.'/js/');
+        preg_match_all('/jsFileLocation:"(.*?)\"/s', $this->formattedFeed['resources']['item'][1], $scriptMatches);
+        $this->scripts = str_replace($scriptMatches[1][0], $fileNameArray, $this->formattedFeed['resources']['item'][1]);
+    }
+    private function setHtml() {
+        preg_match_all('/src=\"(.*?)\\" / s', $this->formattedFeed['resources']['item'][0], $matches);
+        $this->html = ($this->parseLinks($this->formattedFeed['resources']['item'][0], $matches, $this->sliderid));
+    }
 
-
-
-
-    public function index() {
-        $loadXml = $this->loadXml();
-        $changeReturnFormat = json_decode(json_encode($loadXml), 1);
-
-        $this->alias = $changeReturnFormat['slider']['alias'];
-        $this->group = $changeReturnFormat['slider']['group'];
-        $this->css = '';
-        $this->html = '';
-        $this->scripts = '';
-
-        dd($loadXml);
+    private function parseLinks($content, $search = [], $id = false) {
+        $original_links = $search[1];
+        foreach($original_links as $original_link) {
+            $name = substr($original_link, strrpos($original_link, '/') + 1);
+            $names[] = $name;
+            try {
+                Storage::disk('public')->put('sliders/' . $id . '/media/' . $name, $original_link);
+            } catch (\Exception $e) {
+                print('Could not pull external media on the server');
+                die;
+            }
+            $fileNameArray = \Storage::disk('public')->url('sliders/' . $id . '/media/' . $name);
+            $content = str_replace($original_link, $fileNameArray, $content);
+        }
+        return $content;
     }
 
     public function getAlias() {
@@ -45,52 +91,30 @@ class ExtSliderController extends Controller {
         return $this->group;
     }
 
-    public function update() {
+    public function getCSS() {
+        return $this->css;
+    }
 
-//        $xml=('http://sliders.caconnect.ro/index.php?c=admin&m=ajax&action=revslider_ajax_action&client_action=preview_slider&only_markup=true&dummy=false&nonce=&sliderid=2&api=true');
-//        $xml = simplexml_load_file($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-//        $xmlJson = json_encode($xml);
-        $newData = json_decode(json_encode($xmlJson), 1);
-        $sliderHtmlOutput = $newData['slider']['resources']['item'][0];
-        $sliderScriptsOutput = $newData['slider']['resources']['item'][1];
+    public function getScripts() {
+        return $this->scripts;
+    }
 
-        function prepareData($sliderHtml, $toSearch = [], $slider = false) {
-            if(isset($toSearch) && count($toSearch)) {
-                foreach ($toSearch[1] as $k => $src) {
-                    $original_links = $src;
-                    if($slider['id']) {
-                        $contents = file_get_contents($src);
-                        $name = substr($src, strrpos($src, '/') + 1);
-                        $newAssetsPath = $slider['id'] . "/"/*.$slider['alias']."/"*/;
-                        Storage::disk('public')->put('sliders/' . $newAssetsPath . $name, $contents);
-                        $fileName = last(explode('/', $src));
+    public function getHtml() {
+        return $this->html;
+    }
 
-                        $fileNameArray = \Storage::disk('public')->url('sliders/' . $newAssetsPath . $fileName);
-                        $sliderHtml = str_replace($original_links, $fileNameArray, $sliderHtml);
-                    } else {
-                        $fileNameArray = \Storage::disk('public')->url('sliders/assets/');
-                        $sliderHtml =  str_ireplace($original_links, $fileNameArray, $sliderHtml);
+    private function updateTable() {
 
-                    }
-                }
-                return $sliderHtml;
-            }
-        }
-
-        $scriptMatches = array();
-        preg_match_all('/jsFileLocation:"(.*?)\"/s', $sliderScriptsOutput, $scriptMatches);
-
-        $matches = array();
-        preg_match_all('/src=\"(.*?)\\" / s', $sliderHtmlOutput, $matches);
-
-        $slider['slug'] = $newData['slider']['group'];
-        $slider['alias'] = $newData['slider']['alias'];;
-        $slider['scripts'] = (prepareData($sliderScriptsOutput, $scriptMatches));
-        $slider['slider'] = (prepareData($sliderHtmlOutput, $matches, $newData['slider']));
+        $slider['slug'] = $this->group;
+        $slider['alias'] = $this->alias;
+        $slider['css_content'] = $this->css;
+        $slider['html_content'] = $this->html;
+        $slider['scripts_content'] = $this->scripts;
         $slider['created_at'] = \Carbon\Carbon::now()->toDateTimeString();
         $slider['updated_at'] = \Carbon\Carbon::now()->toDateTimeString();
+//        $slider['target_id'] = null;
 
-        $insertion = Sliders::updateOrInsert(['slug' => $newData['slider']['group'], 'alias' => $newData['slider']['alias']], $slider);
+        $insertion = Extslider::updateOrInsert(['external_id' => $this->sliderid], $slider);
 
         if($insertion) {
             print_r("Slider has been updated");

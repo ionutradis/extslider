@@ -15,12 +15,13 @@ class CreateExtslidersTable extends Migration
     {
         Schema::create('extsliders', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedInteger('external_id');
             $table->string('slug', 25);
             $table->string('alias', 25);
             $table->text('html_content')->nullable();
             $table->text('scripts_content')->nullable();
             $table->text('css_content')->nullable();
-            $table->integer('target_id')->unsigned()->nullable();
+            $table->unsignedInteger('target_id')->nullable();
             $table->enum('status', [0,1])->default(0);
             $table->timestamps();
         });
