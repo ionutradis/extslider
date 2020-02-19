@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ExtSliderController {
 
-    private $feed, $alias, $group, $scripts, $css, $html, $sliderid, $formattedFeed, $identifier;
+    private $feed, $alias, $group, $scripts, $css, $html, $sliderid, $formattedFeed, $identifier, $status;
 
     function __construct($identifier, $updateDB = false)
     {
@@ -21,6 +21,7 @@ class ExtSliderController {
         $this->getSlider();
         $this->setSliderid();
         $this->setAlias();
+        $this->setStatus();
         $this->setGroup();
         $this->setScripts();
         $this->setHtml();
@@ -50,6 +51,9 @@ class ExtSliderController {
     private function setSliderid() {
         $this->sliderid= $this->formattedFeed['id'];
     }
+    private function setStatus() {
+        $this->status= $this->formattedFeed['status'];
+    }
     private function setGroup() {
         $this->group = $this->formattedFeed['group'];
     }
@@ -57,9 +61,14 @@ class ExtSliderController {
 //        $this->css = $this->formattedFeed['css'];
     }
     private function setScripts() {
+        preg_match_all('/src="([^"]+)/i', $this->formattedFeed['resources']['item'][2], $matches);
+        if(isset($this->formattedFeed['resources']['item'][2])) {
+            $this->scripts .= $this->parseLinks($this->formattedFeed['resources']['item'][2], $matches);
+        }
+
         $fileNameArray = \Storage::disk('public')->url('sliders/'.$this->sliderid.'/js/');
         preg_match_all('/jsFileLocation:"(.*?)\"/s', $this->formattedFeed['resources']['item'][1], $scriptMatches);
-        $this->scripts = str_replace($scriptMatches[1][0], $fileNameArray, $this->formattedFeed['resources']['item'][1]);
+        $this->scripts .= str_replace($scriptMatches[1][0], $fileNameArray, $this->formattedFeed['resources']['item'][1]);
     }
     private function setHtml() {
         preg_match_all('/src=\"(.*?)\\" / s', $this->formattedFeed['resources']['item'][0], $matches);
@@ -72,12 +81,18 @@ class ExtSliderController {
             $name = substr($original_link, strrpos($original_link, '/') + 1);
             $names[] = $name;
             try {
-                Storage::disk('public')->put('sliders/' . $id . '/media/' . $name, $original_link);
+                $path = 'sliders/';
+                if($id){
+                    $path .= $id . '/media/';
+                } else {
+                    $path .= 'assets/';
+                }
+                Storage::disk('public')->put($path . $name, file_get_contents($original_link));
             } catch (\Exception $e) {
                 print('Could not pull external media on the server');
                 die;
             }
-            $fileNameArray = \Storage::disk('public')->url('sliders/' . $id . '/media/' . $name);
+            $fileNameArray = \Storage::disk('public')->url($path . $name);
             $content = str_replace($original_link, $fileNameArray, $content);
         }
         return $content;
@@ -85,6 +100,10 @@ class ExtSliderController {
 
     public function getAlias() {
         return $this->alias;
+    }
+
+    public function getStatus() {
+        return $this->status;
     }
 
     public function getGroup() {
@@ -107,6 +126,7 @@ class ExtSliderController {
 
         $slider['slug'] = $this->group;
         $slider['alias'] = $this->alias;
+        $slider['status'] = $this->status;
         $slider['css_content'] = $this->css;
         $slider['html_content'] = $this->html;
         $slider['scripts_content'] = $this->scripts;
