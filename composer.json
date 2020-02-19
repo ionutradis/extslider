@@ -19,5 +19,13 @@
         "psr-4": {
             "caconnect\\extslider\\": "src/"
         }
-    }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Simple\\test\\TestServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
 }
