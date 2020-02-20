@@ -37,3 +37,4 @@ class CreateExtslidersTable extends Migration
         Schema::dropIfExists('extsliders');
     }
 }
+?>

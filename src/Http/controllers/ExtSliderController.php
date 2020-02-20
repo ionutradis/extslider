@@ -11,7 +11,7 @@ class ExtSliderController {
     function __construct($identifier, $updateDB = false)
     {
         $this->identifier = $identifier;
-        $this->feed = config('settings.feed_url');
+        $this->feed = config('extslider.feed_url');
         $this->init();
         if($updateDB)
             $this->updateTable();
