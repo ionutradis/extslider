@@ -2,7 +2,7 @@
 
 * INSTALLATION
 
-        composer require ionutradis/extslider:1.0.x-dev
+        composer require ionutradis/extslider:1.1.x-dev
         
 * LOAD PROVIDER IN YOUR config/app.php
 
