@@ -91,7 +91,7 @@ class ExtSliderController {
             $this->scripts .= $this->parseLinks($this->formattedFeed['resources']['item'][2], $matches);
         }
 
-        $fileNameArray = \Storage::disk('public')->url('sliders/'.$this->sliderid.'/js/');
+        $fileNameArray = \Storage::disk('public')->url('sliders/'.md5($this->sliderid.$this->alias).'/js/');
         preg_match_all('/jsFileLocation:"(.*?)\"/s', $this->formattedFeed['resources']['item'][1], $scriptMatches);
         $this->scripts .= str_replace($scriptMatches[1][0], $fileNameArray, $this->formattedFeed['resources']['item'][1]);
     }
@@ -108,7 +108,7 @@ class ExtSliderController {
             try {
                 $path = 'sliders/';
                 if($id){
-                    $path .= $id . '/media/';
+                    $path .= md5($id.$this->alias) . '/media/';
                 } else {
                     $path .= 'assets/';
                 }
