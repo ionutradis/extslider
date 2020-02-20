@@ -1,7 +1,7 @@
 <?php
 namespace ionutradis\extslider\Http\controllers;
 use App\Http\Controllers\Controller;
-use caconnect\extslider\Models\Extslider;
+use ionutradis\extslider\Models\Extslider;
 use Illuminate\Support\Facades\Storage;
 
 class ExtSliderController {

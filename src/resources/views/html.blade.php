@@ -1,5 +1,5 @@
 @php
-    use caconnect\extslider\Models\Extslider;
+    use ionutradis\extslider\Models\Extslider;
     $slider = new Extslider();
     if(isset($id)) {
         $slider = $slider->where('id', $id);
