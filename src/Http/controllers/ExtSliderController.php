@@ -6,25 +6,18 @@ use Illuminate\Support\Facades\Storage;
 
 class ExtSliderController {
 
-    private $feed, $alias, $group, $scripts, $css, $html, $sliderid, $formattedFeed, $identifier, $status;
+    private $feed, $alias, $group, $scripts, $css, $html, $sliderid, $formattedFeed, $identifier, $status, $updateDB;
 
-    function __construct($identifier, $updateDB = false)
+    function __construct($identifier = false, $updateDB = false)
     {
+        $this->updateDB = $updateDB;
         $this->identifier = $identifier;
         $this->feed = config('extslider.feed_url');
         $this->init();
-        if($updateDB)
-            $this->updateTable();
     }
 
     private function init() {
         $this->getSlider();
-        $this->setSliderid();
-        $this->setAlias();
-        $this->setStatus();
-        $this->setGroup();
-        $this->setScripts();
-        $this->setHtml();
     }
 
     protected function loadXml() {
@@ -42,9 +35,41 @@ class ExtSliderController {
             case 'string':
                 $param = 'group';
                 break;
+            case 'boolean':
+                $param = false;
+                break;
         }
-        $this->formattedFeed = json_decode(json_encode($this->loadXml()->xpath('//slider['.$param.'="'.$this->identifier.'"]')[0]), 1);
+        if($param !== false) {
+            if(isset($this->loadXml()->xpath('//slider['.$param.'="'.$this->identifier.'"]')[0])) {
+                $this->formattedFeed = json_decode(json_encode($this->loadXml()->xpath('//slider['.$param.'="'.$this->identifier.'"]')[0]), 1);
+                $this->setContent();
+                if($this->updateDB)
+                    $this->updateTable();
+            } else {
+                print('Error, no slider found');
+                die;
+            }
+        } else {
+//            dd($param);
+//            dd(json_decode(json_encode($this->loadXml()),1)['slider']);
+            foreach(json_decode(json_encode($this->loadXml()),1)['slider'] as $slider) {
+                $this->formattedFeed = $slider;
+                $this->setContent();
+                if($this->updateDB)
+                    $this->updateTable();
+            }
+        }
     }
+
+    private function setContent() {
+        $this->setSliderid();
+        $this->setAlias();
+        $this->setStatus();
+        $this->setGroup();
+        $this->setScripts();
+        $this->setHtml();
+    }
+
     private function setAlias() {
         $this->alias = $this->formattedFeed['alias'];
     }
@@ -137,8 +162,7 @@ class ExtSliderController {
         $insertion = Extslider::updateOrInsert(['external_id' => $this->sliderid], $slider);
 
         if($insertion) {
-            print_r("Slider has been updated");
-            die;
+            print_r("Slider <b>$this->alias</b> - <b>$this->group</b> has been updated. <br>");
         }
 
     }
