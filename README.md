@@ -23,7 +23,13 @@
         
 * IMPORT/UPDATE SLIDERS
 
-        new ExtSliderController('slug', true);
+        new ExtSliderController('slug'); //string type updates local slider by slider group
+                        or
+        new ExtSliderController(1); // int type fetches and stores local slider by external slider id
+                        or
+        new ExtSliderController(true); // bool type tells the script to fetch all the sliders
+                        or
+        new ExtSliderController(1, true); // by passing 'true' as second parameter, the script will also update the slider(s)
         
 * VIEW
 

@@ -36,10 +36,10 @@ class ExtSliderController {
                 $param = 'group';
                 break;
             case 'boolean':
-                $param = false;
+                $param = 'all';
                 break;
         }
-        if($param !== false) {
+        if($param !== 'all') {
             if(isset($this->loadXml()->xpath('//slider['.$param.'="'.$this->identifier.'"]')[0])) {
                 $this->formattedFeed = json_decode(json_encode($this->loadXml()->xpath('//slider['.$param.'="'.$this->identifier.'"]')[0]), 1);
                 $this->setContent();
