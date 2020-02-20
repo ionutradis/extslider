@@ -11,7 +11,7 @@ class ExtSliderServiceProvider extends ServiceProvider {
 
 
         $this->publishes([
-            __DIR__.'/config/extslider.php' => config_path('config/extslider.php'),
+            __DIR__.'/config/extslider.php' => config_path('extslider.php'),
         ], 'config');
     }
 
