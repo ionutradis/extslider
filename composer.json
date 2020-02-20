@@ -2,7 +2,7 @@
     "name": "caconnect/extslider",
     "description": "External slider service extractor",
     "type": "library",
-    "license": "caconnect",
+    "license": "proprietary",
     "authors": [
         {
             "name": "Radis Ionut",
@@ -23,7 +23,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Simple\\test\\TestServiceProvider"
+                "caconnect\\extslider\\ExtSliderServiceProvider"
             ]
         }
     },
