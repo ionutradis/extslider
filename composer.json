@@ -13,7 +13,7 @@
     "autoload": {
         "files":
             [
-                "src/config/settings.php"
+                "src/config/extslider.php"
             ]
         ,
         "psr-4": {
