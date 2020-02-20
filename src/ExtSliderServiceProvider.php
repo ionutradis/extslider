@@ -11,12 +11,12 @@ class ExtSliderServiceProvider extends ServiceProvider {
 
 
         $this->publishes([
-            __DIR__.'/config/settings.php' => config_path('config/settings.php'),
+            __DIR__.'/config/extslider.php' => config_path('config/extslider.php'),
         ], 'config');
     }
 
     public function register() {
-        $this->mergeConfigFrom( __DIR__.'/config/settings.php', 'settings');
+        $this->mergeConfigFrom( __DIR__.'/config/extslider.php', 'extslider');
     }
 }
 
