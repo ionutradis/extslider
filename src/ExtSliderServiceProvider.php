@@ -1,5 +1,5 @@
 <?php
-namespace caconnect\extslider;
+namespace ionutradis\extslider;
 
 use Illuminate\Support\ServiceProvider;
 

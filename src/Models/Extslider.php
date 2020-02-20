@@ -1,6 +1,6 @@
 <?php
 
-namespace caconnect\extslider\Models;
+namespace ionutradis\extslider\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Extslider extends Model

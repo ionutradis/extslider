@@ -1,5 +1,5 @@
 <?php
-namespace caconnect\extslider\Http\controllers;
+namespace ionutradis\extslider\Http\controllers;
 use App\Http\Controllers\Controller;
 use caconnect\extslider\Models\Extslider;
 use Illuminate\Support\Facades\Storage;

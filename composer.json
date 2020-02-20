@@ -1,5 +1,5 @@
 {
-    "name": "caconnect/extslider",
+    "name": "ionutradis/extslider",
     "description": "External slider service extractor",
     "type": "library",
     "license": "proprietary",
@@ -17,13 +17,13 @@
             ]
         ,
         "psr-4": {
-            "caconnect\\extslider\\": "src/"
+            "ionutradis\\extslider\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "caconnect\\extslider\\ExtSliderServiceProvider"
+                "ionutradis\\extslider\\ExtSliderServiceProvider"
             ]
         }
     },
