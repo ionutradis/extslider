@@ -13,7 +13,7 @@
     "autoload": {
         "files":
             [
-                "config/settings.php"
+                "src/config/settings.php"
             ]
         ,
         "psr-4": {
