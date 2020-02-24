@@ -52,9 +52,12 @@ class ExtSliderController {
         } else {
 //            dd($param);
 //            dd(json_decode(json_encode($this->loadXml()),1)['slider']);
-            foreach(json_decode(json_encode($this->loadXml()),1)['sliders'] as $slider) {
-
-                $this->formattedFeed = $slider;
+            foreach(json_decode(json_encode($this->loadXml()),1)['slider'] as $slider) {
+                if(is_array($slider)) {
+                    $this->formattedFeed = $slider[0];
+                } else {
+                    $this->formattedFeed = $slider;
+                }
                 $this->setContent();
                 if($this->updateDB)
                     $this->updateTable();
