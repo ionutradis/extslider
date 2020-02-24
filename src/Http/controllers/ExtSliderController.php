@@ -54,7 +54,7 @@ class ExtSliderController {
 //            dd(json_decode(json_encode($this->loadXml()),1)['slider']);
             foreach(json_decode(json_encode($this->loadXml()),1)['slider'] as $slider) {
                 if(is_array($slider)) {
-                    $this->formattedFeed = $slider[0];
+                    $this->formattedFeed = $slider['slider'];
                 } else {
                     $this->formattedFeed = $slider;
                 }
