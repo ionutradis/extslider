@@ -9,6 +9,6 @@
     }
 @endphp
 
-@if(count($slider->get()) !== 0 && $slider->first()->status == 1 && $slider->first()->mode == 'production')
-    @include('extslider::render')
-@endif
+@include('extslider::css')
+@include('extslider::scripts')
+{!! $slider->first()->html_content !!}

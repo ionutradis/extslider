@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ExtSliderController {
 
-    private $feed, $alias, $group, $scripts, $css, $html, $sliderid, $formattedFeed, $identifier, $status, $updateDB;
+    private $feed, $alias, $group, $scripts, $css, $html, $sliderid, $formattedFeed, $identifier, $status, $updateDB, $access, $mode;
 
     function __construct($identifier = false, $updateDB = false)
     {
@@ -50,11 +50,8 @@ class ExtSliderController {
                 die;
             }
         } else {
-//            dd($param);
-//            dd(json_decode(json_encode($this->loadXml()),1)['slider']);
+
             $content = json_decode(json_encode($this->loadXml()),1)['slider'];
-//            dd($content);
-//            dd($content['id']);
             if(!isset($content['id'])) {
                 foreach($content as $slider) {
                     $this->formattedFeed = $slider;
@@ -75,6 +72,9 @@ class ExtSliderController {
         $this->setSliderid();
         $this->setAlias();
         $this->setStatus();
+        $this->setAccess();
+        $this->setMode();
+        $this->setStatus();
         $this->setGroup();
         $this->setScripts();
         $this->setHtml();
@@ -82,6 +82,12 @@ class ExtSliderController {
 
     private function setAlias() {
         $this->alias = $this->formattedFeed['alias'];
+    }
+    private function setMode() {
+        $this->mode = $this->formattedFeed['mode'];
+    }
+    private function setAccess() {
+        $this->access = $this->formattedFeed['access_allow'];
     }
     private function setSliderid() {
         $this->sliderid= $this->formattedFeed['id'];
@@ -141,6 +147,14 @@ class ExtSliderController {
         return $this->status;
     }
 
+    public function getMode() {
+        return $this->mode;
+    }
+
+    public function getAccess() {
+        return $this->access;
+    }
+
     public function getGroup() {
         return $this->group;
     }
@@ -164,6 +178,8 @@ class ExtSliderController {
         $slider['status'] = $this->status;
         $slider['css_content'] = $this->css;
         $slider['html_content'] = $this->html;
+        $slider['mode'] = $this->mode;
+        $slider['ips'] = $this->access;
         $slider['scripts_content'] = $this->scripts;
         $slider['created_at'] = \Carbon\Carbon::now()->toDateTimeString();
         $slider['updated_at'] = \Carbon\Carbon::now()->toDateTimeString();
