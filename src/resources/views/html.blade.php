@@ -9,6 +9,18 @@
     }
 @endphp
 
-@if(count($slider->get()) !== 0 && $slider->first()->status == 1 && $slider->first()->mode == 'production')
-    @include('extslider::render')
+@if(count($slider->get()) !== 0)
+    @switch([$slider->first()->mode, $slider->first()->status])
+        @case(['production', 1])
+            @include('extslider::render')
+        @break
+        @case(['testing', 1])
+            @php
+                $explodeIps = explode(',', $slider->first()->ips);
+            @endphp
+            @if(in_array(\request()->ip(), $explodeIps) !== false)
+                @include('extslider::render')
+            @endif
+        @break
+    @endswitch
 @endif

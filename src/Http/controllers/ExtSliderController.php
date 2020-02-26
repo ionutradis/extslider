@@ -77,6 +77,7 @@ class ExtSliderController {
         $this->setStatus();
         $this->setGroup();
         $this->setScripts();
+        $this->setCss();
         $this->setHtml();
     }
 
@@ -99,7 +100,7 @@ class ExtSliderController {
         $this->group = $this->formattedFeed['group'];
     }
     private function setCss() {
-//        $this->css = $this->formattedFeed['css'];
+        $this->css = isset($this->formattedFeed['resources']['item'][3]) ? $this->formattedFeed['resources']['item'][3] : '';
     }
     private function setScripts() {
         preg_match_all('/src="([^"]+)/i', $this->formattedFeed['resources']['item'][2], $matches);
@@ -188,7 +189,7 @@ class ExtSliderController {
         $insertion = Extslider::updateOrInsert(['external_id' => $this->sliderid], $slider);
 
         if($insertion) {
-            print_r("Slider <b>$this->alias</b> - <b>$this->group</b> has been updated. <br>");
+            print_r("Slider $this->alias - $this->group has been updated.");
         }
 
     }
